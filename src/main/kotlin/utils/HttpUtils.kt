@@ -3,16 +3,18 @@ import io.ktor.client.call.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.http.*
 import io.ktor.client.request.*
-import io.ktor.http.ContentType.Application.Json
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
+
+
+data class MyData(val value: Int)
 class HttpUtils {
-    var baseUrl = "https://test.demo.cn"
+    var baseUrl = "https://www.baidu.com"
     val httpClient = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             json(Json {
@@ -61,6 +63,19 @@ class HttpUtils {
             close()
         }.flowOn(Dispatchers.IO)
     }
-
+    inline fun <reified T> get(url: String, crossinline params:()-> Map<String, String>): Flow<T> {
+        return flow {
+            val queryParams = params()
+            val response = httpClient.get(url) {
+                queryParams.forEach { parameter(it.key, it.value) }
+            }
+            val result = response.body<T>()
+            emit(result)
+        }.catch { throwable: Throwable ->
+            throw throwable
+        }.onCompletion { cause ->
+            close()
+        }.flowOn(Dispatchers.IO)
+    }
 
 }

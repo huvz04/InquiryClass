@@ -27,9 +27,8 @@ dependencies{
 
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.16.2")
-    implementation("org.bouncycastle:bcpkix-jdk15on:1.69")
-    implementation("org.bouncycastle:bcprov-jdk15on:1.69")
-    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.5")
+
+
 }
 mirai {
     jvmTarget = JavaVersion.VERSION_17
