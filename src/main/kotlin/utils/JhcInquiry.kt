@@ -1,6 +1,10 @@
 package io.huvz.utils
 
 import io.huvz.utils.JsBindings.encryptPwd
+import io.huvz.utils.classConfig.password
+import io.huvz.utils.classConfig.username
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -8,14 +12,19 @@ import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.*
 import org.jsoup.Jsoup
 import java.io.IOException
-import java.net.CookiePolicy
-import java.net.HttpCookie
+import java.time.Year
+import java.util.concurrent.locks.ReentrantLock
 
-class JhcInquiry(private val username: String, private val password: String, private val options: Map<String, Any> = emptyMap()) {
+class JhcInquiry(private val username: String, private val password: String) {
 
+
+
+
+
+    // 解析
     val UserAgent =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
-
+    private val lock = ReentrantLock()
     private val xnm = "2023"
     private val xqm = "3"
     private var execution: String? = null
@@ -27,12 +36,9 @@ class JhcInquiry(private val username: String, private val password: String, pri
         .cookieJar(cookieg1)
         .followRedirects(true)
         .build()
-    init {
 
-        initial()
-    }
-
-    private fun initial() {
+    //需要手动实例化才会登录
+    fun initial(onInitializationComplete: (Boolean) -> Unit) {
         println("----------------initial----------------")
 
         val request = Request.Builder()
@@ -51,7 +57,9 @@ class JhcInquiry(private val username: String, private val password: String, pri
                     body?.let {
                         val doc = Jsoup.parse(it)
                         execution = doc.select("input[name=execution]").attr("value")
-                        getPubKey()
+                        getPubKey(){
+                            onInitializationComplete(true)
+                        }
                     }
                 } catch (e: Exception) {
                     println("An error occurred in initial because: $e")
@@ -60,7 +68,7 @@ class JhcInquiry(private val username: String, private val password: String, pri
         })
     }
 
-    private fun getPubKey() {
+    private fun getPubKey(callback: (Boolean) -> Unit) {
         println("----------------getPubKey----------------")
         val request = Request.Builder()
             .url("https://rz.jhc.cn/zfca/v2/getPubKey")
@@ -78,8 +86,10 @@ class JhcInquiry(private val username: String, private val password: String, pri
                         val json = it?.let { it1 -> Json.decodeFromString<JsonObject>(it1) }
                         modulus = json?.get("modulus")?.jsonPrimitive?.content ?: ""
                         exponent = json?.get("exponent")?.jsonPrimitive?.content ?: ""
-                        cookieg1.printCookies()
-                        login()
+                        login(){
+                            callback(true)
+                        }
+
                     }
                 } catch (e: Exception) {
                     println("An error occurred in getPubKey because: $e")
@@ -87,8 +97,7 @@ class JhcInquiry(private val username: String, private val password: String, pri
             }
         })
     }
-
-    private fun login() {
+    private fun login(callback: (Boolean) -> Unit) {
         println("----------------login----------------")
         val formBody = execution?.let {
             FormBody.Builder()
@@ -120,8 +129,7 @@ class JhcInquiry(private val username: String, private val password: String, pri
                     try {
                         val body = response.body?.string()
                         loginStatus = true
-                        cookieg1.printCookies()
-                        println(body)
+                        callback(true)
                     } catch (e: Exception) {
                         println("An error occurred in login because: $e")
                     }
@@ -130,19 +138,62 @@ class JhcInquiry(private val username: String, private val password: String, pri
         }
 
     }
+
+     fun queryCourse(njdmid: String,zyhid: String,bhid: String, callback: (JsonObject?) -> Unit) {
+
+
+
+         var result : JsonObject? = null;
+            val formBody = FormBody.Builder()
+                .add("xnm", xnm)
+                .add("xqm", xqm)
+                .add("njdm_id", njdmid)
+                .add("zyh_id", zyhid)
+                .add("bh_id", bhid)
+                .add("tjkbzdm", "1")
+                .add("tjkbzxsdm", "0")
+                .build()
+
+         val request = Request.Builder()
+            .url("https://jwglxt.jhc.cn/jwglxt/kbdy/bjkbdy_cxBjKb.html?gnmkdm=N214505")
+            .post(formBody)
+            .build()
+
+         client.newCall(request)
+             .enqueue(object : Callback {
+             override fun onFailure(call: Call, e: IOException)
+             {
+                 //initial()
+                 println("An error occurred in queryCourse because: $e")
+             }
+             override fun onResponse(call: Call, response: Response) {
+                 try {
+                     val body = response.body?.string()
+                     val json = body?.let { Json.decodeFromString<JsonObject>(it) }
+                     if (json != null) {
+
+                         result = json
+                     };
+                     callback(result)
+                 } catch (e: Exception) {
+                     //initial()
+                     println("An error occurred in queryCourse because: $e")
+                }
+            }
+        })
+ }
+
 }
 
 class Cookiejar1 : CookieJar {
     private val cookieStore = mutableMapOf<String, MutableList<Cookie>>()
 
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-        println("=============新的Cookies入栈=============")
         cookieStore[url.host]?.addAll(cookies) ?: cookieStore.put(url.host, cookies.toMutableList())
     }
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
-        println("=============新的Cookies加载=============")
-        printCookies()
+        //printCookies()
         return cookieStore[url.host] ?: emptyList()
     }
 
