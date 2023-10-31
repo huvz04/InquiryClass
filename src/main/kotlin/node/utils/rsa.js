@@ -6,6 +6,7 @@
  * changed by Fuchun, 2010-05-06
  * fcrpg2005@gmail.com
  */
+//const classList = require("./classList.json");
 let $w = {};
 
 if (typeof $w.RSAUtils === "undefined") var RSAUtils = ($w.RSAUtils = {});
@@ -765,5 +766,25 @@ RSAUtils.decryptedString = function (key, s) {
 };
 
 RSAUtils.setMaxDigits(130);
+function getNum(str) {
+  console.log('获取参数:', str);
+  return str?.length > 0 ? str.length : "";
+}
 
-module.exports = $w;
+function encryptPwd(password, exponent, modulus) {
+  const key = new RSAUtils.getKeyPair(exponent, "", modulus);
+  const reversedPwd = password.split("").reverse().join("");
+  return RSAUtils.encryptedString(key, reversedPwd);
+}
+
+
+// const modulus =
+//     'b9adfe238a34fbd6cf592f2ce794c46d103cee9bccb9f8a9e446a17d3872cc2e144897cef7aa317240f3ba7fb162c411775f2a5968991d781694ee548fce626d';
+// const exponent = '10001';
+//
+// console.log('------------- 生成加密的 -------------');
+// const str = 'A@ww20030401';
+// console.log('str:', str);
+// const encryptR = encryptPwd(str, exponent, modulus);
+// console.log('encryptR:', encryptR);
+

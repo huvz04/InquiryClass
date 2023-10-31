@@ -6,7 +6,7 @@ const { encryptPwd, getNum } = require("./utils");
 const jar = _request.jar();
 const request = _request.defaults({ jar });
 const UserAgent =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
 
 class JhcInquiry {
   xnm = "2023";
@@ -132,7 +132,8 @@ class JhcInquiry {
 
 module.exports = JhcInquiry;
 
-// const jhcInquiry = new JhcInquiry("202110101550022", "*******");
+ const jhcInquiry = new JhcInquiry("202110101550022", "*******");
+// @ts-check
 
 // const express = require("express");
 // const app = express();

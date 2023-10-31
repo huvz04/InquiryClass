@@ -9,7 +9,6 @@ module.exports = {
   encryptPwd(password, exponent, modulus) {
     const key = new RSAUtils.getKeyPair(exponent, "", modulus);
     const reversedPwd = password.split("").reverse().join("");
-    const encrypedPwd = RSAUtils.encryptedString(key, reversedPwd);
-    return encrypedPwd;
-  },
+    return RSAUtils.encryptedString(key, reversedPwd);
+  }
 };

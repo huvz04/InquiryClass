@@ -16,14 +16,20 @@ repositories {
     mavenCentral()
 }
 dependencies{
-    // https://mvnrepository.com/artifact/org.graalvm.js/js
-    implementation ("io.ktor:ktor-client-okhttp:$ktor_version")
-    implementation ("io.ktor:ktor-client-auth:$ktor_version")
-    implementation( "io.ktor:ktor-client-core:$ktor_version")
-    implementation ("io.ktor:ktor-client-logging:$ktor_version")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
-    implementation("io.ktor:ktor-client-cio:$ktor_version")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("junit:junit:4.13.1")
+// https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-serialization-json-jvm
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.6.0")
+// https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on
+    implementation("org.bouncycastle:bcprov-jdk18on:1.76")
+
+
+
+    // https://mvnrepository.com/artifact/org.graalvm.polyglot/polyglot
+        implementation("org.graalvm.polyglot:polyglot:23.1.1")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.1")
 
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.16.2")
