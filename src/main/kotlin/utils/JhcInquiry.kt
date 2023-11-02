@@ -1,10 +1,6 @@
 package io.huvz.utils
 
 import io.huvz.utils.JsBindings.encryptPwd
-import io.huvz.utils.classConfig.password
-import io.huvz.utils.classConfig.username
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -12,8 +8,6 @@ import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.*
 import org.jsoup.Jsoup
 import java.io.IOException
-import java.time.Year
-import java.util.concurrent.locks.ReentrantLock
 
 class JhcInquiry(private val username: String, private val password: String) {
 
@@ -24,9 +18,8 @@ class JhcInquiry(private val username: String, private val password: String) {
     // 解析
     val UserAgent =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
-    private val lock = ReentrantLock()
-    private val xnm = "2023"
-    private val xqm = "3"
+    private val xnm = imaTime.getcurrentYear().toString()
+    private val xqm = imaTime.getSemesterNumber().toString()
     private var execution: String? = null
     private var modulus: String? = null
     private var exponent: String? = null
@@ -139,12 +132,13 @@ class JhcInquiry(private val username: String, private val password: String) {
 
     }
 
-     fun queryCourse(njdmid: String,zyhid: String,bhid: String, callback: (JsonObject?) -> Unit) {
+     fun queryCourse(zs:String,njdmid: String,zyhid: String,bhid: String, callback: (String?) -> Unit) {
 
 
 
-         var result : JsonObject? = null;
+         var result : String? = null;
             val formBody = FormBody.Builder()
+                .add("zs",zs)
                 .add("xnm", xnm)
                 .add("xqm", xqm)
                 .add("njdm_id", njdmid)
@@ -169,10 +163,9 @@ class JhcInquiry(private val username: String, private val password: String) {
              override fun onResponse(call: Call, response: Response) {
                  try {
                      val body = response.body?.string()
-                     val json = body?.let { Json.decodeFromString<JsonObject>(it) }
-                     if (json != null) {
+                     if (body != null) {
 
-                         result = json
+                         result = body
                      };
                      callback(result)
                  } catch (e: Exception) {

@@ -1,6 +1,8 @@
 package io.huvz
 
+import io.huvz.utils.getClassList
 import io.huvz.utils.getclass
+import net.mamoe.mirai.console.command.CommandManager
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import net.mamoe.mirai.utils.info
@@ -17,6 +19,8 @@ object InquiryClass : KotlinPlugin(
 ) {
     override fun onEnable() {
         logger.info { "Plugin loaded" }
-        getclass.test("计算机211")
+        CommandManager.registerCommand(getclass)
+        CommandManager.registerCommand(getClassList)
+
     }
 }
