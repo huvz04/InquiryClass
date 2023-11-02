@@ -5,7 +5,7 @@ import org.graalvm.polyglot.Source
 
 
 
-object JsBindings {
+object JsBuilder {
 
 
 

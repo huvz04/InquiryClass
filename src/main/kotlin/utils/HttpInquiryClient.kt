@@ -1,6 +1,6 @@
 package io.huvz.utils
 
-import io.huvz.utils.JsBindings.encryptPwd
+import io.huvz.utils.JsBuilder.encryptPwd
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject

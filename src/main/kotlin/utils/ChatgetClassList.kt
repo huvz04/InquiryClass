@@ -4,7 +4,7 @@ import io.huvz.InquiryClass
 import net.mamoe.mirai.console.command.CommandSender
 import net.mamoe.mirai.console.command.SimpleCommand
 
-object getClassList: SimpleCommand(InquiryClass,"getClassList","班级列表",description = "获取全部的课表")  {
+object ChatgetClassList: SimpleCommand(InquiryClass,"getClassList","班级列表",description = "获取全部的课表")  {
     @Handler
     suspend fun handlerlist(sender: CommandSender) {
         val jsonResult = classdata.getList()

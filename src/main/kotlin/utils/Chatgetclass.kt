@@ -12,7 +12,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
-object getclass  : SimpleCommand(InquiryClass,"weekClass","本周课表",description = "获取全部的课表") {
+object Chatgetclass  : SimpleCommand(InquiryClass,"weekClass","本周课表",description = "获取全部的课表") {
 
     @Handler
     suspend fun handlerlist(sender: CommandSender, className: String) {
