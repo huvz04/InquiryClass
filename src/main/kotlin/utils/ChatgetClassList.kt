@@ -11,7 +11,7 @@ object ChatgetClassList: SimpleCommand(InquiryClass,"getClassList","班级列表
         var listString : List<String> = listOf()
         if(jsonResult!=null)
             listString = jsonResult.classes.stream().map { it.bj }.toList()
-        var msg = "找不到列表";if(listString.size>0)msg= listString.toString()
+        var msg = "找不到列表";if(listString.isNotEmpty())msg= listString.toString()
         sender.subject?.sendMessage(msg)
     }
 

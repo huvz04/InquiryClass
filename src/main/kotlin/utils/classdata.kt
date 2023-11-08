@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -17,7 +18,87 @@ object classdata {
     }
 }
 
+class JHclient{
+    companion object{
+        var jhc : JhcInquiry? =null;
 
+        fun init(){
+            jhc = JhcInquiry(classConfig.username, classConfig.password)
+        }
+        fun getClassLesson(classname:String,CallBack : (MyClassList?) ->Unit){
+
+            val json = Json {
+                ignoreUnknownKeys = true // 添加忽略未知键的配置
+            }
+
+            //实例化
+            var j1: JsonObject?= null;
+
+            if(jhc==null) init()
+            val jhc1 = JHclient.jhc
+            var resultmsg: ClassInfo? =null
+            var secondmsg: ClassInfo? =null;
+
+            val jsonResult = classdata.getList()
+            if(classname.length<=3) {
+                CallBack(null);
+            }
+            val clas2 = classname.substring(0,2);
+            if(jsonResult!=null){
+                for( i  in jsonResult.classes)
+                {
+                    if(classname.contains(i.bj))   resultmsg = i
+                    if(i.bj.startsWith(clas2)) secondmsg = i
+                }
+            }
+
+            var njid = "2021"
+
+            if(resultmsg!=null)
+            {
+                val resultid = Chatgetclass.extractFirstTwoDigits(resultmsg.bj)
+                njid  = "20"+resultid
+            }
+            else if(secondmsg!=null){
+                val resultid = Chatgetclass.extractFirstTwoDigits(secondmsg.bj)
+                njid  = "20"+resultid
+                resultmsg = secondmsg;
+            }
+            else{
+//            val resultid = extractFirstTwoDigits("计算机221")
+//            njid  = "20"+resultid
+//            resultmsg= ClassInfo("计算机221","0155","E0741C9F9B317ECBE053D30F080A0B6F")
+                CallBack(null)
+            }
+
+            jhc1?.initial { success ->
+                if (success) {
+                    resultmsg?.let {
+                        jhc1.queryCourse(imaTime.getcurrentWeek().toString(), njid, it.zyh_id, it.bh_id)
+                        { result ->
+                            // 处理查询结果
+                            if (result != null) {
+                                // 查询成功，处理返回的 JSON 对象
+                                val myclass: MyClassList = json.decodeFromString<MyClassList>(result)
+                                CallBack(myclass)
+                                return@queryCourse
+                            } else {
+                                // 查询失败
+                                println("Failed to query course.")
+                            }
+                        }
+                    }
+
+
+                } else {
+                    println("Login Fail")
+                }
+
+            }
+        }
+    }
+
+}
 
 // 班级信息
 @Serializable
